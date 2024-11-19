@@ -37,6 +37,6 @@ jobs:
            echo "Merging main into $branch"
            git fetch origin $branch:$branch || echo "Failed to fetch $branch"
            git checkout $branch -- || echo "Failed to checkout $branch"
-           git merge main -m "Merge: main into $branch" || echo "Merge conflict in $branch, resolving manually required"
+           git merge main -m "Merge: main into $branch" || echo "Merge conflict in $branch, resolving manually required."
            git push origin $branch || echo "Failed to push $branch"
          done
