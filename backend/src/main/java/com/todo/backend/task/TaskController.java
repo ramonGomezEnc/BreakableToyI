@@ -18,7 +18,14 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks() {
-        return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<Task>> getAllTasks(
+            @RequestParam(required = false) String nameFilter,
+            @RequestParam(required = false) String priorityFilter,
+            @RequestParam(required = false) Boolean isCompletedFilter,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) Boolean isDescending,
+            @RequestParam(defaultValue = "0") int page) {
+        List<Task> tasks = service.getTasks(nameFilter, priorityFilter, isCompletedFilter, sortBy, isDescending, page);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 }

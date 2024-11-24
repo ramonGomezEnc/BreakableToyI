@@ -14,7 +14,10 @@ public class TaskService {
         this.repository = repository;
     }
 
-    public List<Task> findAll() {
-        return repository.findAll();
+    public List<Task> getTasks(String nameFilter, String priorityFilter, Boolean isCompletedFilter, String sortBy, Boolean isDescending, int page) {
+        List<Task> allTasks = repository.fetchTasks();
+        allTasks = repository.applyFiltering(allTasks, nameFilter, priorityFilter, isCompletedFilter);
+        allTasks = repository.applySorting(allTasks, sortBy, isDescending);
+        return repository.applyPagination(allTasks, page);
     }
 }
