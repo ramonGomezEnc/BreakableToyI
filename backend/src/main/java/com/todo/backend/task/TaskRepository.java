@@ -6,8 +6,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-import static java.util.Comparator.*;
-
 @Repository
 public class TaskRepository {
     private final HashMap<Long, Task> tasks = new HashMap<>();
@@ -27,14 +25,17 @@ public class TaskRepository {
     }
 
     public List<Task> applySorting(List<Task> tasks, String sortBy, Boolean isDescending) {
-        Comparator<Task> comparator = naturalOrder();
+        Comparator<Task> comparator = Comparator.naturalOrder();
 
         if ("priority".equalsIgnoreCase(sortBy)) {
-            comparator = comparing(Task::getPriority);
+            comparator = Comparator.comparing(Task::getPriority);
         } else if ("dueDate".equalsIgnoreCase(sortBy)) {
-            comparator = comparing(Task::getDueDate);
+            comparator = Comparator.comparing(
+                    Task::getDueDate,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+            );
         }
-        if (isDescending)  comparator = comparator.reversed();
+        if (Boolean.TRUE.equals(isDescending))  comparator = comparator.reversed();
 
         return tasks.stream()
             .sorted(comparator)

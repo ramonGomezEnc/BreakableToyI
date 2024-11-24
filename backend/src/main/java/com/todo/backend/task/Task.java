@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
-import java.util.Optional;
 
 enum PriorityLevel { High, Medium, Low }
 
@@ -20,7 +19,7 @@ public class Task implements Comparable<Task> {
     private boolean completed;
     private Date createdAt;
     private Date completedAt;
-    private Optional<Date> dueDate = Optional.empty();
+    private Date dueDate;
 
     @Override
     public int compareTo(@NotNull Task o) {
