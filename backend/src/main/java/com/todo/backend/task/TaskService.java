@@ -3,60 +3,28 @@ package com.todo.backend.task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
     private final TaskRepository repository;
 
-    private void validateNewTask(Task task) {
-        if (task.getId() != null && repository.checkIfTaskExists(task.getId()))
-            throw new IllegalArgumentException("Task already exists.");
-
-        if (task.getName() == null || task.getName().trim().isEmpty())
-            throw new IllegalArgumentException("Task text is required.");
-
+    private void validateTask(Task task) {
         if (task.getName().length() > 120)
             throw new IllegalArgumentException("Task text cannot exceed 120 characters.");
 
-        if (task.getPriority() == null)
-            throw new IllegalArgumentException("Task priority is required.");
-
         if (!EnumSet.of(PriorityLevel.High, PriorityLevel.Medium, PriorityLevel.Low).contains(task.getPriority()))
             throw new IllegalArgumentException("Task priority must be High, Medium, or Low.");
-
-        if (task.isCompleted() && task.getCompletedAt() == null)
-            throw new IllegalArgumentException("A completed task must have a done date.");
-
-        if (!task.isCompleted() && task.getCompletedAt() != null)
-            throw new IllegalArgumentException("An incomplete task cannot have a done date.");
-
-        if (task.getDueDate() != null && task.getDueDate().before(new Date()))
-            throw new IllegalArgumentException("Task due date cannot be in the past.");
 
         if (task.getCreatedAt() != null)
             throw new IllegalArgumentException("Task cannot have a proper created date.");
-    }
 
-    private void validateExistingTask(Long id, Task task) {
-        if (!repository.checkIfTaskExists(id))
-            throw new IllegalArgumentException("Task does not exist");
+        if (task.getCompletedAt() != null)
+            throw new IllegalArgumentException("Task cannot have a proper completed date.");
 
-        if (task.getName() == null && task.getPriority() == null && task.getDueDate() == null)
-            throw new IllegalArgumentException("At least one field (name, priority, or due date) must be provided.");
-
-        if (task.getName() != null && task.getName().length() > 120)
-            throw new IllegalArgumentException("Task text cannot exceed 120 characters.");
-
-        if (!EnumSet.of(PriorityLevel.High, PriorityLevel.Medium, PriorityLevel.Low).contains(task.getPriority()))
-            throw new IllegalArgumentException("Task priority must be High, Medium, or Low.");
-
-        if (task.getDueDate() != null && task.getDueDate().before(new Date()))
-            throw new IllegalArgumentException("Task due date cannot be in the past.");
+        if (task.isCompleted())
+            throw new IllegalArgumentException("Task cannot be completed.");
     }
 
     private String calculateAverage(List<Task> tasks) {
@@ -88,7 +56,16 @@ public class TaskService {
     }
 
     public Task createTask(Task task) {
-        validateNewTask(task);
+        if (task.getId() != null && repository.checkIfTaskExists(task.getId()))
+            throw new IllegalArgumentException("Task already exists.");
+
+        if (task.getName() == null || task.getName().trim().isEmpty())
+            throw new IllegalArgumentException("Task text is required.");
+
+        if (task.getPriority() == null)
+            throw new IllegalArgumentException("Task priority is required.");
+
+        validateTask(task);
         return repository.createTask(task);
     }
 
@@ -99,7 +76,9 @@ public class TaskService {
     }
 
     public Task updateTaskContent(Long id, Task task) {
-        validateExistingTask(id, task);
+        if (!repository.checkIfTaskExists(id))
+            throw new IllegalArgumentException("Task does not exist");
+        validateTask(task);
         return repository.updateTaskContent(id, task);
     }
 
@@ -115,7 +94,7 @@ public class TaskService {
     }
 
     public String calculateAverageTimeByPriority(String priority) {
-        if (!EnumSet.of(PriorityLevel.High, PriorityLevel.Medium, PriorityLevel.Low).contains(priority))
+        if (!Set.of("High", "Medium", "Low").contains(priority))
             throw new IllegalArgumentException("Task priority must be High, Medium, or Low.");
 
         List<Task> tasksByPriority = repository.fetchTasks();
