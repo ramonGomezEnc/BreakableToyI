@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import TaskFilters from './TaskFilters';
 import TaskList from './TaskList';
-import TaskModal from './TaskModal';
+import TaskModal, { Task } from './TaskModal';
 import Pagination from './Pagination';
 import Statistics from './Statistics';
 import { Button } from '@mui/material';
@@ -20,14 +20,6 @@ const ButtonWrapper = styled.div`
   justify-content: flex-start;
 `;
 
-interface Task {
-  id: number;
-  name: string;
-  priority: string;
-  dueDate: string;
-  done: boolean;
-}
-
 const TaskManager: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([
@@ -38,12 +30,12 @@ const TaskManager: React.FC = () => {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
   const handleOpenModalForCreation = () => {
-    setTaskToEdit(null); // Para creación, no hay tarea seleccionada
+    setTaskToEdit(null);
     setOpenModal(true);
   };
 
   const handleOpenModalForEdit = (task: Task) => {
-    setTaskToEdit(task); // Establece la tarea a editar
+    setTaskToEdit(task);
     setOpenModal(true);
   };
 
@@ -52,7 +44,7 @@ const TaskManager: React.FC = () => {
   };
 
   const handleSaveTask = (task: Task) => {
-    if (task.id) {
+    if (task.id !== undefined) {
       // Edición
       setTasks((prevTasks) =>
         prevTasks.map((t) => (t.id === task.id ? { ...task } : t))
@@ -80,7 +72,7 @@ const TaskManager: React.FC = () => {
         open={openModal}
         onClose={handleCloseModal}
         onSave={handleSaveTask}
-        taskToEdit={taskToEdit || undefined} // Pasa la tarea si está en modo edición
+        taskToEdit={taskToEdit || undefined}
       />
     </StyledContainer>
   );

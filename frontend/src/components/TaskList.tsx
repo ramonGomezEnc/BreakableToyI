@@ -1,13 +1,6 @@
 import React from 'react';
 import { Table, TableHead, TableRow, TableCell, TableBody, Checkbox, Button } from '@mui/material';
-
-interface Task {
-  id: number;
-  name: string;
-  priority: string;
-  dueDate: string;
-  done: boolean;
-}
+import { Task } from './TaskModal';
 
 interface TaskListProps {
   tasks: Task[];
