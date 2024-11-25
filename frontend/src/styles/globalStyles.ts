@@ -8,31 +8,46 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    display: flex;
-    justify-content: center; /* Horizontally center */
-    align-items: center; /* Vertically center */
-    min-height: 100vh; /* Ensure full height of the viewport */
     font-family: 'Roboto', sans-serif;
     background-color: #f5f5f5;
     color: #333;
   }
 
-  a {
-    text-decoration: none;
-    color: inherit;
+  #root {
+    max-width: 1400px;
+    margin: 0 auto;
   }
 
-  ul, ol {
-    list-style: none;
+  input, select, button {
+    width: 100%;
+    max-width: 600px
+    margin-bottom: 10px;
   }
-    
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+
+  table {
+    width: 100%
+    max-width: 1200px;
+    margin: 20px auto
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #ddd
+  }
+
+  td {
+    border-bottom: 1px solid #ccc
+  }
+
+  /* Button alignment and size */
+  button {
+    display: block;
+    width: fit-content;
+    padding: 10px 20px;
   }
 `;
