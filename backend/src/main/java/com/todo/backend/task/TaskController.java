@@ -18,7 +18,7 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks(
+    public ResponseEntity<TaskResponse> getAllTasks(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String priority,
             @RequestParam(required = false) Boolean isCompleted,

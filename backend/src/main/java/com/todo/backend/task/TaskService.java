@@ -48,11 +48,13 @@ public class TaskService {
         this.repository = repository;
     }
 
-    public List<Task> getTasks(String nameFilter, String priorityFilter, Boolean isCompletedFilter, String sortBy, String order, int page) {
+    public TaskResponse getTasks(String nameFilter, String priorityFilter, Boolean isCompletedFilter, String sortBy, String order, int page) {
         List<Task> allTasks = repository.fetchTasks();
+        Integer length = allTasks.size();
         allTasks = repository.applyFiltering(allTasks, nameFilter, priorityFilter, isCompletedFilter);
         allTasks = repository.applySorting(allTasks, sortBy, order);
-        return repository.applyPagination(allTasks, page);
+        allTasks = repository.applyPagination(allTasks, page);
+        return new TaskResponse(allTasks, length);
     }
 
     public Task createTask(Task task) {
