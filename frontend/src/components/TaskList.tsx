@@ -11,9 +11,10 @@ interface Task {
 
 interface TaskListProps {
   tasks: Task[];
+  onEditTask: (task: Task) => void;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
+const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask }) => {
   return (
     <Table>
       <TableHead>
@@ -35,7 +36,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
             <TableCell>{task.priority}</TableCell>
             <TableCell>{task.dueDate}</TableCell>
             <TableCell>
-              <Button size="small" color="primary">
+              <Button size="small" color="primary" onClick={() => onEditTask(task)}>
                 Edit
               </Button>
               <Button size="small" color="error">

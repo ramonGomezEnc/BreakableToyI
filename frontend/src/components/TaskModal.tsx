@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -9,38 +9,56 @@ import {
   MenuItem,
 } from '@mui/material';
 
+interface Task {
+  id?: number;
+  name: string;
+  priority: string;
+  dueDate: string;
+  done?: boolean;
+}
+
 interface TaskModalProps {
   open: boolean;
   onClose: () => void;
-  onCreateTask: (task: { name: string; priority: string; dueDate: string }) => void;
+  onSave: (task: Task) => void;
+  taskToEdit?: Task; // Opcional: para la edición de tareas
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreateTask }) => {
-  const [newTask, setNewTask] = useState({
+const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onSave, taskToEdit }) => {
+  const [task, setTask] = useState<Task>({
     name: '',
     priority: 'Low',
     dueDate: '',
+    done: false,
   });
+
+  // Rellena los campos del modal cuando se edita una tarea existente
+  useEffect(() => {
+    if (taskToEdit) {
+      setTask(taskToEdit);
+    } else {
+      setTask({ name: '', priority: 'Low', dueDate: '', done: false }); // Reset para creación
+    }
+  }, [taskToEdit]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewTask((prevTask) => ({ ...prevTask, [name]: value }));
+    setTask((prevTask) => ({ ...prevTask, [name]: value }));
   };
 
-  const handleCreateTask = () => {
-    onCreateTask(newTask);
-    setNewTask({ name: '', priority: 'Low', dueDate: '' }); // Reset form
-    onClose(); // Close modal
+  const handleSave = () => {
+    onSave(task); // Llama a la función para guardar la tarea (creación o edición)
+    onClose(); // Cierra el modal
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Create New Task</DialogTitle>
+      <DialogTitle>{taskToEdit ? 'Edit Task' : 'Create New Task'}</DialogTitle>
       <DialogContent>
         <TextField
           label="Task Name"
           name="name"
-          value={newTask.name}
+          value={task.name}
           onChange={handleInputChange}
           fullWidth
           margin="normal"
@@ -49,7 +67,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreateTask }) =>
           select
           label="Priority"
           name="priority"
-          value={newTask.priority}
+          value={task.priority}
           onChange={handleInputChange}
           fullWidth
           margin="normal"
@@ -62,7 +80,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreateTask }) =>
           label="Due Date"
           name="dueDate"
           type="date"
-          value={newTask.dueDate}
+          value={task.dueDate}
           onChange={handleInputChange}
           fullWidth
           margin="normal"
@@ -75,8 +93,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onCreateTask }) =>
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleCreateTask} color="primary">
-          Create
+        <Button onClick={handleSave} color="primary">
+          {taskToEdit ? 'Save Changes' : 'Create'}
         </Button>
       </DialogActions>
     </Dialog>
