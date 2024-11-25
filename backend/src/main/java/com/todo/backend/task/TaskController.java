@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/tasks")
+@RequestMapping("/api/v1/todos")
 public class TaskController {
     private final TaskService service;
 
@@ -19,13 +19,36 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks(
-            @RequestParam(required = false) String nameFilter,
-            @RequestParam(required = false) String priorityFilter,
-            @RequestParam(required = false) Boolean isCompletedFilter,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) Boolean isCompleted,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) Boolean isDescending,
+            @RequestParam(required = false) String order,
             @RequestParam(defaultValue = "0") int page) {
-        List<Task> tasks = service.getTasks(nameFilter, priorityFilter, isCompletedFilter, sortBy, isDescending, page);
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
+        return new ResponseEntity<>(service.getTasks(name, priority, isCompleted, sortBy, order, page), HttpStatus.OK);
     }
+
+    @PostMapping
+    public ResponseEntity<Task> createTask(@RequestBody Task payload) {
+        return new ResponseEntity<>(service.createTask(payload), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/list")
+    public ResponseEntity<List<Task>> createTasks(@RequestBody List<Task> tasks) {
+        List<Task> createdTasks = service.createTasks(tasks);
+        return new ResponseEntity<>(createdTasks, HttpStatus.CREATED);
+    }
+
+
+    @PutMapping("/{taskId}")
+    public ResponseEntity<Task> updateTask(@PathVariable Long taskId, @RequestBody Task payload) {
+        return new ResponseEntity<>(service.updateTaskContent(taskId, payload), HttpStatus.OK);
+    }
+
+    @PatchMapping("/{taskId}/{status}")
+    public ResponseEntity<Task> updateTaskStatus(@PathVariable Long taskId, @PathVariable String status) {
+        return new ResponseEntity<>(service.updateTaskStatus(taskId, status), HttpStatus.OK);
+    }
+
 }
+

@@ -16,7 +16,7 @@ public class Task implements Comparable<Task> {
     private Long id;
     private String name;
     private PriorityLevel priority;
-    private boolean completed;
+    private boolean isCompleted;
     private Date createdAt;
     private Date completedAt;
     private Date dueDate;
