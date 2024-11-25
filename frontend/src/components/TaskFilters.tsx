@@ -4,6 +4,9 @@ import styled from 'styled-components';
 
 const MainContainer = styled(Box)`
   display: flex;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
   flex-direction: column;
   margin-bottom: 30px;
   gap: 20px;

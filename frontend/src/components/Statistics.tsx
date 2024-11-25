@@ -1,10 +1,10 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import { CardContent, Typography, Box } from '@mui/material';
 import styled from '@emotion/styled';
 
-const StyledStatistics = styled(Card)`
-  background-color: #f9f9f9;
-  margin-top: 20px;
+const StyledStatistics = styled(Box)`
+  border: 1px solid #ddd;
+  border-radius: 5px;
 `;
 
 const Statistics: React.FC = () => {
