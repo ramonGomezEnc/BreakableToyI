@@ -50,5 +50,17 @@ public class TaskController {
         return new ResponseEntity<>(service.updateTaskStatus(taskId, status), HttpStatus.OK);
     }
 
+    @GetMapping("/averageTime")
+    public ResponseEntity<String> getAverageTime() {
+        String averageTime = service.calculateAverageTime();
+        return new ResponseEntity<>(averageTime, HttpStatus.OK);
+    }
+
+    @GetMapping("/averageTime/{priority}")
+    public ResponseEntity<String> getAverageTimeByPriority(@PathVariable String priority) {
+        String averageTime = service.calculateAverageTimeByPriority(priority);
+        return new ResponseEntity<>(averageTime, HttpStatus.OK);
+    }
+
 }
 

@@ -59,6 +59,22 @@ public class TaskService {
             throw new IllegalArgumentException("Task due date cannot be in the past.");
     }
 
+    private String calculateAverage(List<Task> tasks) {
+        if (tasks.isEmpty()) return "0:00";
+
+        long totalDurationMillis = tasks.stream()
+                .filter(task -> task.getCreatedAt() != null && task.getCompletedAt() != null)
+                .mapToLong(task -> task.getCompletedAt().getTime() - task.getCreatedAt().getTime())
+                .sum();
+
+        long averageMillis = totalDurationMillis / tasks.size();
+        long totalSeconds = averageMillis / 1000;
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+
+        return String.format("%d:%02d", minutes, seconds);
+    }
+
     @Autowired
     public TaskService(TaskRepository repository) {
         this.repository = repository;
@@ -91,5 +107,19 @@ public class TaskService {
         if (!repository.checkIfTaskExists(id)) throw new IllegalArgumentException("Task does not exist");
         if (!Objects.equals(status, "done") && !Objects.equals(status, "undone")) throw new IllegalArgumentException("Task status is not correct");
         return repository.updateTaskStatus(id, status);
+    }
+
+    public String calculateAverageTime() {
+        List<Task> tasks = repository.fetchTasks();
+        return calculateAverage(tasks);
+    }
+
+    public String calculateAverageTimeByPriority(String priority) {
+        if (!EnumSet.of(PriorityLevel.High, PriorityLevel.Medium, PriorityLevel.Low).contains(priority))
+            throw new IllegalArgumentException("Task priority must be High, Medium, or Low.");
+
+        List<Task> tasksByPriority = repository.fetchTasks();
+        tasksByPriority = repository.applyFiltering(tasksByPriority, null, priority, null);
+        return calculateAverage(tasksByPriority);
     }
 }
