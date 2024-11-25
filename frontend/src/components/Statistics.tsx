@@ -14,7 +14,8 @@ const Statistics: React.FC = () => {
         <Typography variant="h6">Statistics</Typography>
         <Box display="flex" justifyContent="space-between" mt={2}>
           <div>
-            <strong>Average time to finish tasks:</strong> 22:15 minutes
+            <strong>Average time to finish tasks:</strong>
+            <p>22:15 minutes</p>
           </div>
           <div>
             <strong>Average time by priority:</strong>
