@@ -33,6 +33,7 @@ public class TaskController {
         return new ResponseEntity<>(service.createTask(payload), HttpStatus.CREATED);
     }
 
+    // Only for testing
     @PostMapping("/list")
     public ResponseEntity<List<Task>> createTasks(@RequestBody List<Task> tasks) {
         List<Task> createdTasks = service.createTasks(tasks);
