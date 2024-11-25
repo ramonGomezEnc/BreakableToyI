@@ -8,7 +8,6 @@ import Statistics from './Statistics';
 import { Button } from '@mui/material';
 
 const StyledContainer = styled.div`
-  width: 1000px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
