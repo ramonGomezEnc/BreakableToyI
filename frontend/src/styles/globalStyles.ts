@@ -14,7 +14,7 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   #root {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
   }
 
@@ -44,7 +44,6 @@ export const GlobalStyles = createGlobalStyle`
     border-bottom: 1px solid #ccc
   }
 
-  /* Button alignment and size */
   button {
     display: block;
     width: fit-content;

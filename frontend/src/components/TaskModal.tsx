@@ -9,7 +9,7 @@ import {
   MenuItem,
 } from '@mui/material';
 
-interface Task {
+export interface Task {
   id?: number;
   name: string;
   priority: string;
@@ -21,7 +21,7 @@ interface TaskModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (task: Task) => void;
-  taskToEdit?: Task; // Opcional: para la edición de tareas
+  taskToEdit?: Task; 
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onSave, taskToEdit }) => {
@@ -32,12 +32,11 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onSave, taskToEdit
     done: false,
   });
 
-  // Rellena los campos del modal cuando se edita una tarea existente
   useEffect(() => {
     if (taskToEdit) {
       setTask(taskToEdit);
     } else {
-      setTask({ name: '', priority: 'Low', dueDate: '', done: false }); // Reset para creación
+      setTask({ name: '', priority: 'Low', dueDate: '', done: false });
     }
   }, [taskToEdit]);
 
@@ -47,8 +46,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onSave, taskToEdit
   };
 
   const handleSave = () => {
-    onSave(task); // Llama a la función para guardar la tarea (creación o edición)
-    onClose(); // Cierra el modal
+    onSave(task);
+    onClose();
   };
 
   return (
