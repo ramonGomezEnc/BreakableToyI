@@ -83,4 +83,8 @@ public class TaskRepository {
         tasks.put(id, existingTask);
         return existingTask;
     }
+
+    public void deleteTask(Long id) {
+        tasks.remove(id);
+    }
 }

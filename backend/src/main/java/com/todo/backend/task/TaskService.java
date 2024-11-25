@@ -88,6 +88,11 @@ public class TaskService {
         return repository.updateTaskStatus(id, status);
     }
 
+    public String deleteTask(Long id) {
+        repository.deleteTask(id);
+        return "The task was deleted";
+    }
+
     public String calculateAverageTime() {
         List<Task> tasks = repository.fetchTasks();
         return calculateAverage(tasks);

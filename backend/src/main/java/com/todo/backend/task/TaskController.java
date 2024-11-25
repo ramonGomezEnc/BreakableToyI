@@ -51,6 +51,11 @@ public class TaskController {
         return new ResponseEntity<>(service.updateTaskStatus(taskId, status), HttpStatus.OK);
     }
 
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<String> deleteTask(@PathVariable Long taskId) {
+        return new ResponseEntity<>(service.deleteTask(taskId), HttpStatus.OK);
+    }
+
     @GetMapping("/averageTime")
     public ResponseEntity<String> getAverageTime() {
         String averageTime = service.calculateAverageTime();
