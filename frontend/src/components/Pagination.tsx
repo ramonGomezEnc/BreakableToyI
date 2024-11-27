@@ -8,12 +8,21 @@ const StyledPagination = styled.div`
   margin: 20px 0;
 `;
 
-const Pagination: React.FC = () => {
-  return (
-    <StyledPagination>
-      <MuiPagination count={10} color="primary" />
-    </StyledPagination>
-  );
-};
+interface PaginationProps {
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (event: React.ChangeEvent<unknown>, page: number) => void;
+}
+
+const Pagination: React.FC<PaginationProps> = ({ totalPages, currentPage, onPageChange }) => (
+  <StyledPagination>
+    <MuiPagination
+      count={totalPages}
+      page={currentPage + 1}
+      onChange={(event, page) => onPageChange(event, page - 1)}
+      color="primary"
+    />
+  </StyledPagination>
+);
 
 export default Pagination;

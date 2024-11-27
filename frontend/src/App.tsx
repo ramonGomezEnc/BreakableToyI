@@ -1,16 +1,12 @@
 import React from 'react';
 import { GlobalStyles } from './styles/globalStyles';
-import TaskManager from './components/TaskManager';
+import TaskContainer from './containers/taskContainer';
 
-const App: React.FC = () => {
-  return (
-    <>
-      <GlobalStyles />
-      <div>
-        <TaskManager />
-      </div>
-    </>
-  );
-};
+const App: React.FC = () => (
+  <>
+    <GlobalStyles />
+    <TaskContainer />
+  </>
+);
 
 export default App;

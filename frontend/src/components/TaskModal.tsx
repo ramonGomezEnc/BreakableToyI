@@ -8,41 +8,49 @@ import {
   Button,
   MenuItem,
 } from '@mui/material';
-
-export interface Task {
-  id?: number;
-  name: string;
-  priority: string;
-  dueDate: string;
-  done?: boolean;
-}
+import { Task } from '../constants/taskConstants';
 
 interface TaskModalProps {
   open: boolean;
+  modalType: "create" | "edit";
   onClose: () => void;
   onSave: (task: Task) => void;
-  taskToEdit?: Task; 
+  taskToEdit: Task | undefined;
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onSave, taskToEdit }) => {
+const TaskModal: React.FC<TaskModalProps> = ({ open, modalType, onClose, onSave, taskToEdit }) => {
   const [task, setTask] = useState<Task>({
+    id: 0,
     name: '',
     priority: 'Low',
-    dueDate: '',
-    done: false,
+    createdAt: new Date(),
+    completedAt: new Date(),
+    dueDate: new Date(),
+    completed: false,
   });
 
   useEffect(() => {
     if (taskToEdit) {
       setTask(taskToEdit);
     } else {
-      setTask({ name: '', priority: 'Low', dueDate: '', done: false });
+      setTask({
+        id: 0,
+        name: '',
+        priority: 'Low',
+        createdAt: new Date(),
+        completedAt: new Date(),
+        dueDate: new Date(),
+        completed: false,
+      });
     }
   }, [taskToEdit]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setTask((prevTask) => ({ ...prevTask, [name]: value }));
+    setTask((prevTask) => ({
+      ...prevTask,
+      [name]: name === 'dueDate' ? new Date(value) : value,
+    }));
   };
 
   const handleSave = () => {
@@ -52,7 +60,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onSave, taskToEdit
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{taskToEdit ? 'Edit Task' : 'Create New Task'}</DialogTitle>
+      <DialogTitle>{modalType === 'edit' ? 'Edit Task' : 'Create New Task'}</DialogTitle>
       <DialogContent>
         <TextField
           label="Task Name"
@@ -79,7 +87,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onSave, taskToEdit
           label="Due Date"
           name="dueDate"
           type="date"
-          value={task.dueDate}
+          value={task.dueDate && new Date(task.dueDate).toISOString().substring(0, 10)}
           onChange={handleInputChange}
           fullWidth
           margin="normal"
@@ -89,11 +97,11 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, onClose, onSave, taskToEdit
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={onClose} color="warning">
           Cancel
         </Button>
         <Button onClick={handleSave} color="primary">
-          {taskToEdit ? 'Save Changes' : 'Create'}
+          {modalType === 'edit' ? 'Save Changes' : 'Create'}
         </Button>
       </DialogActions>
     </Dialog>

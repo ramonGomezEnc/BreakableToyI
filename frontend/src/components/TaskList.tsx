@@ -1,40 +1,116 @@
 import React from 'react';
-import { Table, TableHead, TableRow, TableCell, TableBody, Checkbox, Button } from '@mui/material';
-import { Task } from './TaskModal';
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Checkbox,
+  IconButton,
+} from '@mui/material';
+import { Edit, Delete } from '@mui/icons-material';
+import { TableSortLabel } from '@mui/material';
+
+import { Task } from '../constants/taskConstants';
 
 interface TaskListProps {
   tasks: Task[];
-  onEditTask: (task: Task) => void;
+  onToggleCompletion: (taskId: number) => void;
+  onEditTask: (taskId: number) => void;
+  onDeleteTask: (taskId: number) => void;
+  onSort: (field: 'priority' | 'dueDate', direction: 'asc' | 'desc') => void;
+  sortField: 'priority' | 'dueDate' | undefined;
+  sortDirection: 'asc' | 'desc' | undefined;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ tasks, onEditTask }) => {
+const TaskList: React.FC<TaskListProps> = ({
+  tasks,
+  onToggleCompletion,
+  onEditTask,
+  onDeleteTask,
+  onSort,
+  sortField,
+  sortDirection,
+}) => {
+  const handleSort = (field: 'priority' | 'dueDate') => {
+    const isAsc = sortField === field && sortDirection === 'asc';
+    onSort(field, isAsc ? 'desc' : 'asc');
+  };
+
+  const handleToggleAll = () => {
+    const allCompleted = tasks.every((task) => task.completed);
+    tasks.forEach((task) => {
+      if (task.completed !== !allCompleted) {
+        onToggleCompletion(task.id);
+      }
+    });
+  };
+
   return (
     <Table>
       <TableHead>
         <TableRow>
-          <TableCell>Select</TableCell>
+          <TableCell>
+            <Checkbox
+              indeterminate={
+                tasks.some((task) => task.completed) &&
+                !tasks.every((task) => task.completed)
+              }
+              checked={tasks.every((task) => task.completed)}
+              onChange={() => handleToggleAll()}
+            />
+          </TableCell>
           <TableCell>Name</TableCell>
-          <TableCell>Priority</TableCell>
-          <TableCell>Due Date</TableCell>
+          <TableCell>
+            <TableSortLabel
+              active={sortField === 'priority'}
+              direction={sortField === 'priority' ? sortDirection : 'asc'}
+              onClick={() => handleSort('priority')}
+            >
+              Priority
+            </TableSortLabel>
+          </TableCell>
+          <TableCell>
+            <TableSortLabel
+              active={sortField === 'dueDate'}
+              direction={sortField === 'dueDate' ? sortDirection : 'asc'}
+              onClick={() => handleSort('dueDate')}
+            >
+              Due Date
+            </TableSortLabel>
+          </TableCell>
           <TableCell>Actions</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
-        {tasks.map((task) => (
-          <TableRow key={task.id}>
+        {tasks.map(({ id, completed, name, priority, dueDate }) => (
+          <TableRow key={id}>
             <TableCell>
-              <Checkbox defaultChecked={task.done} />
+              <Checkbox
+                checked={completed}
+                onChange={() => onToggleCompletion(id)}
+              />
             </TableCell>
-            <TableCell>{task.name}</TableCell>
-            <TableCell>{task.priority}</TableCell>
-            <TableCell>{task.dueDate}</TableCell>
+            <TableCell>{name}</TableCell>
+            <TableCell>{priority}</TableCell>
             <TableCell>
-              <Button size="small" color="primary" onClick={() => onEditTask(task)}>
-                Edit
-              </Button>
-              <Button size="small" color="error">
-                Delete
-              </Button>
+              {dueDate ? new Date(dueDate).toISOString().substring(0, 10) : '-'}
+            </TableCell>
+            <TableCell>
+              <IconButton
+                color="primary"
+                onClick={() => onEditTask(id)}
+                aria-label="Edit Task"
+              >
+                <Edit />
+              </IconButton>
+              <IconButton
+                color="error"
+                onClick={() => onDeleteTask(id)}
+                aria-label="Delete Task"
+              >
+                <Delete />
+              </IconButton>
             </TableCell>
           </TableRow>
         ))}

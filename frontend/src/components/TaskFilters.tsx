@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TextField, Select, MenuItem, Button, Box, Typography } from '@mui/material';
 import styled from 'styled-components';
 
@@ -24,11 +24,6 @@ const NameContainer = styled(Box)`
 
   .name-input {
     flex-grow: 1;
-    max-width: 100%;
-
-    @media (max-width: 768px) {
-      max-width: 100%;
-    }
   }
 `;
 
@@ -61,7 +56,6 @@ const PriorityContainer = styled(Box)`
 
   .priority-select {
     flex-grow: 1;
-    max-width: 400px;
   }
 `;
 
@@ -76,7 +70,6 @@ const StateContainer = styled(Box)`
 
   .state-select {
     flex-grow: 1;
-    max-width: 400px;
   }
 `;
 
@@ -89,7 +82,19 @@ const SearchButton = styled(Button)`
   }
 `;
 
-const TaskFilters: React.FC = () => {
+interface TaskFiltersProps {
+  onFilter: (filters: { name: string; priority: string; state: string }) => void;
+}
+
+const TaskFilters: React.FC<TaskFiltersProps> = ({ onFilter }) => {
+  const [name, setName] = useState('');
+  const [priority, setPriority] = useState('All');
+  const [state, setState] = useState('All');
+
+  const handleSearch = () => {
+    onFilter({ name, priority, state });
+  };
+
   return (
     <MainContainer>
       <NameContainer>
@@ -101,6 +106,8 @@ const TaskFilters: React.FC = () => {
           label="Search by Name"
           variant="outlined"
           size="small"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
       </NameContainer>
 
@@ -112,7 +119,8 @@ const TaskFilters: React.FC = () => {
             </Typography>
             <Select
               className="priority-select"
-              defaultValue="All"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
               variant="outlined"
               size="small"
             >
@@ -129,17 +137,18 @@ const TaskFilters: React.FC = () => {
             </Typography>
             <Select
               className="state-select"
-              defaultValue="All"
+              value={state}
+              onChange={(e) => setState(e.target.value)}
               variant="outlined"
               size="small"
             >
               <MenuItem value="All">All</MenuItem>
-              <MenuItem value="Done">Done</MenuItem>
-              <MenuItem value="Undone">Undone</MenuItem>
+              <MenuItem value="true">Done</MenuItem>
+              <MenuItem value="false">Undone</MenuItem>
             </Select>
           </StateContainer>
         </OptionContainer>
-        <SearchButton variant="contained" color="primary">
+        <SearchButton variant="contained" color="primary" onClick={handleSearch}>
           Search
         </SearchButton>
       </FilterContainer>
