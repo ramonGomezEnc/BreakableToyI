@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { RootState, AppDispatch } from '../store/store';
@@ -39,23 +39,24 @@ const TaskContainer: React.FC = () => {
 
   const tasksPerPage = 10;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { name, priority, state } = filters;
-      await Promise.all([
-        dispatch(fetchTasks(currentPage, name, priority, state, sortField, sortDirection)),
-        dispatch(fetchAverage()),
-        dispatch(fetchAverageByPriority('High')),
-        dispatch(fetchAverageByPriority('Medium')),
-        dispatch(fetchAverageByPriority('Low')),
-      ]);
-    };
-    fetchData();
+  const fetchData = useCallback(() => {
+    const { name, priority, state } = filters;
+    dispatch(fetchTasks(currentPage, name, priority, state, sortField, sortDirection));
+    dispatch(fetchAverage());
+    dispatch(fetchAverageByPriority('High'));
+    dispatch(fetchAverageByPriority('Medium'));
+    dispatch(fetchAverageByPriority('Low'));
   }, [dispatch, currentPage, filters, sortField, sortDirection]);
-
-  const handleToggleCompletion = (taskId: number) => dispatch(toggleTaskCompletion(taskId));
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => setCurrentPage(page);
+
+  const handleToggleCompletion = (taskId: number) => {
+    dispatch(toggleTaskCompletion(taskId));
+    fetchData();
+  };
 
   const handleEditTask = (taskId: number) => {
     const taskToEdit = tasks.find((task) => task.id === taskId);
