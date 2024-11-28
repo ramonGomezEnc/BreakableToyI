@@ -53,9 +53,24 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, modalType, onClose, onSave,
     }));
   };
 
+  const validateTask = (): boolean => {
+    if (task.name.length > 120) {
+      alert('The task name cannot exceed 120 characters.');
+      return false;
+    }
+
+    if (task.dueDate && new Date(task.dueDate) < new Date(task.createdAt)) {
+      alert('The due date cannot be earlier than the created date.');
+      return false;
+    }
+    return true;
+  };
+
   const handleSave = () => {
-    onSave(task);
-    onClose();
+    if (validateTask()) {
+      onSave(task);
+      onClose();
+    }
   };
 
   return (
@@ -83,18 +98,22 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, modalType, onClose, onSave,
           <MenuItem value="Medium">Medium</MenuItem>
           <MenuItem value="High">High</MenuItem>
         </TextField>
-        <TextField
-          label="Due Date"
-          name="dueDate"
-          type="date"
-          value={task.dueDate && new Date(task.dueDate).toISOString().substring(0, 10)}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
+      <TextField
+        label="Due Date"
+        name="dueDate"
+        type="date"
+        value={
+          task.dueDate && !isNaN(new Date(task.dueDate).getTime())
+            ? new Date(task.dueDate).toISOString().substring(0, 10)
+            : ''
+        }
+        onChange={handleInputChange}
+        fullWidth
+        margin="normal"
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="warning">

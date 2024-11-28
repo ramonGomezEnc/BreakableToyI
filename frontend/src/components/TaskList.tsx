@@ -32,6 +32,7 @@ const TaskList: React.FC<TaskListProps> = ({
   sortField,
   sortDirection,
 }) => {
+
   const handleSort = (field: 'priority' | 'dueDate') => {
     const isAsc = sortField === field && sortDirection === 'asc';
     onSort(field, isAsc ? 'desc' : 'asc');
@@ -84,14 +85,29 @@ const TaskList: React.FC<TaskListProps> = ({
       </TableHead>
       <TableBody>
         {tasks.map(({ id, completed, name, priority, dueDate }) => (
-          <TableRow key={id}>
+          <TableRow
+              key={id}
+              style={{
+                backgroundColor:
+                  !dueDate
+                    ? 'inherit'
+                    : new Date(dueDate).getTime() - Date.now() < 1000 * 60 * 60 * 24 * 7
+                    ? '#ffd3d3'
+                    : new Date(dueDate).getTime() - Date.now() < 1000 * 60 * 60 * 24 * 14
+                    ? '#fff4d3'
+                    : '#d3ffd3', 
+              }}
+            >
             <TableCell>
               <Checkbox
                 checked={completed}
                 onChange={() => onToggleCompletion(id)}
               />
             </TableCell>
+            {completed ?
+            <TableCell><s>{name}</s></TableCell> :
             <TableCell>{name}</TableCell>
+            }
             <TableCell>{priority}</TableCell>
             <TableCell>
               {dueDate ? new Date(dueDate).toISOString().substring(0, 10) : '-'}

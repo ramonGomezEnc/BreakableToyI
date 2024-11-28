@@ -54,6 +54,8 @@ export const saveTask = (task: Task): AppThunk => async (dispatch) => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { createdAt, completedAt, ...modifiableTask } = task;
+
+    console.log(modifiableTask);
     const response = task.id
       ? await axios.put<Task>(`${API_URL}/${task.id}`, modifiableTask)
       : await axios.post<Task>(API_URL, modifiableTask );

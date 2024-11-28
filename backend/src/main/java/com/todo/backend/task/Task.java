@@ -1,5 +1,6 @@
 package com.todo.backend.task;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ enum PriorityLevel { High, Medium, Low }
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task implements Comparable<Task> {
     private Long id;
     private String name;

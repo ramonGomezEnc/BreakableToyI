@@ -65,7 +65,7 @@ public class TaskRepository {
     public Task updateTaskContent(Long id, Task task) {
         Task existingTask = tasks.get(id);
         if (task.getName() != null) existingTask.setName(task.getName());
-        if (task.getDueDate() != null) existingTask.setDueDate(task.getDueDate());
+        existingTask.setDueDate(task.getDueDate());
         if (task.getPriority() != null) existingTask.setPriority(task.getPriority());
         tasks.put(id, existingTask);
         return existingTask;

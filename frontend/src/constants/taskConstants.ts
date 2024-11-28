@@ -13,7 +13,7 @@ export interface Task {
   priority: 'Low' | 'Medium' | 'High';
   createdAt: Date;
   completedAt: Date | null;
-  dueDate: Date | null;
+  dueDate?: Date | null;
   completed: boolean;
 }
 
