@@ -91,6 +91,9 @@ public class TaskService {
     }
 
     public String deleteTask(Long id) {
+        if (!repository.checkIfTaskExists(id)) {
+            throw new IllegalArgumentException("Task does not exist");
+        }
         repository.deleteTask(id);
         return "The task was deleted";
     }

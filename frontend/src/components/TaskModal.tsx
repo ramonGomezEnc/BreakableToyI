@@ -78,6 +78,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, modalType, onClose, onSave,
       <DialogTitle>{modalType === 'edit' ? 'Edit Task' : 'Create New Task'}</DialogTitle>
       <DialogContent>
         <TextField
+          id="task-name-input"
           label="Task Name"
           name="name"
           value={task.name}
@@ -86,6 +87,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, modalType, onClose, onSave,
           margin="normal"
         />
         <TextField
+          id="task-priority-input"
           select
           label="Priority"
           name="priority"
@@ -99,6 +101,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ open, modalType, onClose, onSave,
           <MenuItem value="High">High</MenuItem>
         </TextField>
       <TextField
+        id="task-due-date-input"
         label="Due Date"
         name="dueDate"
         type="date"
