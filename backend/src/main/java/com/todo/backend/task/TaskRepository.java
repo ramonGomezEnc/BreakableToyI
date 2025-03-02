@@ -1,22 +1,18 @@
 package com.todo.backend.task;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Repository
-public class TaskRepository {
-    private final HashMap<Long, Task> tasks = new HashMap<>();
-    private final AtomicLong idGenerator = new AtomicLong(1);
-    private static final int DEFAULT_PAGE_SIZE = 10;
+public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    public List<Task> fetchTasks() {
-        return new ArrayList<>(tasks.values());
-    }
-
-    public List<Task> applyFiltering(List<Task> tasks, String nameFilter, String priorityFilter, Boolean isCompletedFilter) {
+    // Filters tasks based on name, priority, and completion status
+    default List<Task> applyFiltering(List<Task> tasks, String nameFilter, String priorityFilter, Boolean isCompletedFilter) {
         return tasks.stream()
             .filter(task -> isCompletedFilter == null || task.isCompleted() == isCompletedFilter)
             .filter(task -> nameFilter == null || task.getName().toLowerCase().contains(nameFilter.toLowerCase()))
@@ -24,7 +20,8 @@ public class TaskRepository {
             .collect(Collectors.toList());
     }
 
-    public List<Task> applySorting(List<Task> tasks, String sortBy, String order) {
+    // Sorts tasks based on specified criteria
+    default List<Task> applySorting(List<Task> tasks, String sortBy, String order) {
         Comparator<Task> comparator = Comparator.naturalOrder();
 
         if ("priority".equalsIgnoreCase(sortBy)) {
@@ -42,49 +39,12 @@ public class TaskRepository {
             .collect(Collectors.toList());
     }
 
-    public List<Task> applyPagination(List<Task> tasks, int page) {
+    // Applies pagination to the list of tasks
+    default List<Task> applyPagination(List<Task> tasks, int page) {
+        final int DEFAULT_PAGE_SIZE = 10;
         return tasks.stream()
             .skip((long) page * DEFAULT_PAGE_SIZE)
             .limit(DEFAULT_PAGE_SIZE)
             .collect(Collectors.toList());
-    }
-
-    public Task createTask(Task task) {
-        task.setId(idGenerator.getAndIncrement());
-        task.setCreatedAt(new Date());
-        task.setCompleted(false);
-        task.setCompletedAt(null);
-        tasks.put(task.getId(), task);
-        return task;
-    }
-
-    public Boolean checkIfTaskExists(Long id) {
-        return tasks.containsKey(id);
-    }
-
-    public Task updateTaskContent(Long id, Task task) {
-        Task existingTask = tasks.get(id);
-        if (task.getName() != null) existingTask.setName(task.getName());
-        existingTask.setDueDate(task.getDueDate());
-        if (task.getPriority() != null) existingTask.setPriority(task.getPriority());
-        tasks.put(id, existingTask);
-        return existingTask;
-    }
-
-    public Task updateTaskStatus(Long id, String status) {
-        Task existingTask = tasks.get(id);
-        if (Objects.equals(status, "done") ) {
-            existingTask.setCompleted(true);
-            existingTask.setCompletedAt(new Date());
-        } else if (Objects.equals(status, "undone") ) {
-            existingTask.setCompleted(false);
-            existingTask.setCompletedAt(null);
-        }
-        tasks.put(id, existingTask);
-        return existingTask;
-    }
-
-    public void deleteTask(Long id) {
-        tasks.remove(id);
     }
 }
