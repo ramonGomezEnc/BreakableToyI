@@ -1,5 +1,7 @@
 package com.todo.backend.task;
 
+import com.todo.backend.task.dto.TaskDTO;
+import com.todo.backend.task.dto.TaskResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,23 +12,25 @@ import java.util.stream.Collectors;
 public class TaskService {
     private final TaskRepository repository;
 
-    private void validateTask(Task task) {
-        if (task.getName().length() > 120)
-            throw new IllegalArgumentException("Task text cannot exceed 120 characters.");
+    private static final Set<String> VALID_PRIORITIES = Set.of("High", "Medium", "Low");
 
-        if (!EnumSet.of(PriorityLevel.High, PriorityLevel.Medium, PriorityLevel.Low).contains(task.getPriority()))
-            throw new IllegalArgumentException("Task priority must be High, Medium, or Low.");
-
-        if (task.getCreatedAt() != null)
-            throw new IllegalArgumentException("Task cannot have a proper created date.");
-
-        if (task.getCompletedAt() != null)
-            throw new IllegalArgumentException("Task cannot have a proper completed date.");
-
-        if (task.isCompleted())
-            throw new IllegalArgumentException("Task cannot be completed.");
+    @Autowired
+    public TaskService(TaskRepository repository) {
+        this.repository = repository;
     }
 
+    // Validate the task DTO
+    private void validateTask(TaskDTO taskDTO) {
+        if (taskDTO.getName().length() > 120) {
+            throw new IllegalArgumentException("Task text cannot exceed 120 characters.");
+        }
+
+        if (!VALID_PRIORITIES.contains(taskDTO.getPriority())) {
+            throw new IllegalArgumentException("Task priority must be High, Medium, or Low.");
+        }
+    }
+
+    // Calculate the average time for tasks
     private String calculateAverage(List<Task> tasks) {
         if (tasks.isEmpty()) return "0:00";
 
@@ -43,71 +47,86 @@ public class TaskService {
         return String.format("%d:%02d", minutes, seconds);
     }
 
-    @Autowired
-    public TaskService(TaskRepository repository) {
-        this.repository = repository;
-    }
-
-    public TaskResponse getTasks(String nameFilter, String priorityFilter, Boolean isCompletedFilter, String sortBy, String order, int page) {
-        List<Task> allTasks = repository.fetchTasks();
-        Integer length = allTasks.size();
+    // Get tasks with filtering, sorting, and pagination
+    public List<TaskResponseDTO> getTasks(String nameFilter, String priorityFilter, Boolean isCompletedFilter, String sortBy, String order, int page) {
+        List<Task> allTasks = repository.findAll();
         allTasks = repository.applyFiltering(allTasks, nameFilter, priorityFilter, isCompletedFilter);
         allTasks = repository.applySorting(allTasks, sortBy, order);
         allTasks = repository.applyPagination(allTasks, page);
-        return new TaskResponse(allTasks, length);
-    }
-
-    public Task createTask(Task task) {
-        if (task.getId() != null && repository.checkIfTaskExists(task.getId()))
-            throw new IllegalArgumentException("Task already exists.");
-
-        if (task.getName() == null || task.getName().trim().isEmpty())
-            throw new IllegalArgumentException("Task text is required.");
-
-        if (task.getPriority() == null)
-            throw new IllegalArgumentException("Task priority is required.");
-
-        validateTask(task);
-        return repository.createTask(task);
-    }
-
-    public List<Task> createTasks(List<Task> tasks) {
-        return tasks.stream()
-                .map(repository::createTask)
+        return allTasks.stream()
+                .map(TaskConverter::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public Task updateTaskContent(Long id, Task task) {
-        if (!repository.checkIfTaskExists(id))
-            throw new IllegalArgumentException("Task does not exist");
-        validateTask(task);
-        return repository.updateTaskContent(id, task);
+    // Create a new task
+    public TaskResponseDTO createTask(TaskDTO taskDTO) {
+        validateTask(taskDTO);
+        Task task = TaskConverter.convertToEntity(taskDTO);
+        task.setCreatedAt(new Date());
+        task.setCompleted(false);
+        task.setCompletedAt(null);
+        Task savedTask = repository.save(task);
+        return TaskConverter.convertToDTO(savedTask);
     }
 
-    public Task updateTaskStatus(Long id, String status) {
-        if (!repository.checkIfTaskExists(id)) throw new IllegalArgumentException("Task does not exist");
-        if (!Objects.equals(status, "done") && !Objects.equals(status, "undone")) throw new IllegalArgumentException("Task status is not correct");
-        return repository.updateTaskStatus(id, status);
+    // Create multiple tasks
+    public List<TaskResponseDTO> createTasks(List<TaskDTO> taskDTOs) {
+        return taskDTOs.stream()
+                .map(this::createTask)
+                .collect(Collectors.toList());
     }
 
+    // Update task content
+    public TaskResponseDTO updateTaskContent(Long id, TaskDTO taskDTO) {
+        validateTask(taskDTO);
+        Task existingTask = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Task not found"));
+        if (taskDTO.getName() != null) existingTask.setName(taskDTO.getName());
+        existingTask.setDueDate(taskDTO.getDueDate());
+        if (taskDTO.getPriority() != null) existingTask.setPriority(PriorityLevel.valueOf(taskDTO.getPriority()));
+        Task updatedTask = repository.save(existingTask);
+        return TaskConverter.convertToDTO(updatedTask);
+    }
+
+    // Update task status
+    public TaskResponseDTO updateTaskStatus(Long id, String status) {
+        Task existingTask = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("Task not found"));
+
+        if ("done".equalsIgnoreCase(status)) {
+            existingTask.setCompleted(true);
+            existingTask.setCompletedAt(new Date());
+        } else if ("undone".equalsIgnoreCase(status)) {
+            existingTask.setCompleted(false);
+            existingTask.setCompletedAt(null);
+        } else {
+            throw new IllegalArgumentException("Task status is not correct");
+        }
+
+        Task updatedTask = repository.save(existingTask);
+        return TaskConverter.convertToDTO(updatedTask);
+    }
+
+    // Delete a task
     public String deleteTask(Long id) {
-        if (!repository.checkIfTaskExists(id)) {
+        if (!repository.existsById(id)) {
             throw new IllegalArgumentException("Task does not exist");
         }
-        repository.deleteTask(id);
+        repository.deleteById(id);
         return "The task was deleted";
     }
 
+    // Calculate average time for all tasks
     public String calculateAverageTime() {
-        List<Task> tasks = repository.fetchTasks();
+        List<Task> tasks = repository.findAll();
         return calculateAverage(tasks);
     }
 
+    // Calculate average time for tasks by priority
     public String calculateAverageTimeByPriority(String priority) {
-        if (!Set.of("High", "Medium", "Low").contains(priority))
+        if (!VALID_PRIORITIES.contains(priority)) {
             throw new IllegalArgumentException("Task priority must be High, Medium, or Low.");
+        }
 
-        List<Task> tasksByPriority = repository.fetchTasks();
+        List<Task> tasksByPriority = repository.findAll();
         tasksByPriority = repository.applyFiltering(tasksByPriority, null, priority, null);
         return calculateAverage(tasksByPriority);
     }

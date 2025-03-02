@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import jakarta.persistence.*;
 import java.util.Date;
 
 enum PriorityLevel { High, Medium, Low }
@@ -14,7 +15,10 @@ enum PriorityLevel { High, Medium, Low }
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Entity
 public class Task implements Comparable<Task> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private PriorityLevel priority;
