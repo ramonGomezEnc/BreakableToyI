@@ -1,6 +1,7 @@
 package com.todo.backend.task;
 
 import com.todo.backend.task.dto.TaskDTO;
+import com.todo.backend.task.dto.TaskListResponseDTO;
 import com.todo.backend.task.dto.TaskResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,14 +49,15 @@ public class TaskService {
     }
 
     // Get tasks with filtering, sorting, and pagination
-    public List<TaskResponseDTO> getTasks(String nameFilter, String priorityFilter, Boolean isCompletedFilter, String sortBy, String order, int page) {
+    public TaskListResponseDTO getTasks(String nameFilter, String priorityFilter, Boolean isCompletedFilter, String sortBy, String order, int page) {
         List<Task> allTasks = repository.findAll();
         allTasks = repository.applyFiltering(allTasks, nameFilter, priorityFilter, isCompletedFilter);
         allTasks = repository.applySorting(allTasks, sortBy, order);
         allTasks = repository.applyPagination(allTasks, page);
-        return allTasks.stream()
+        List<TaskResponseDTO> taskResponseDTOs = allTasks.stream()
                 .map(TaskConverter::convertToDTO)
                 .collect(Collectors.toList());
+        return new TaskListResponseDTO(taskResponseDTOs, allTasks.size());
     }
 
     // Create a new task

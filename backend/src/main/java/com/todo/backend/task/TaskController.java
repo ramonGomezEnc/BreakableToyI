@@ -1,6 +1,7 @@
 package com.todo.backend.task;
 
 import com.todo.backend.task.dto.TaskDTO;
+import com.todo.backend.task.dto.TaskListResponseDTO;
 import com.todo.backend.task.dto.TaskResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class TaskController {
 
     // Retrieves all tasks with optional filtering, sorting, and pagination
     @GetMapping
-    public ResponseEntity<List<TaskResponseDTO>> getAllTasks(
+    public ResponseEntity<TaskListResponseDTO> getAllTasks(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String priority,
             @RequestParam(required = false) Boolean isCompleted,
