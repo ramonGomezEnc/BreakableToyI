@@ -71,13 +71,6 @@ public class TaskService {
         return TaskConverter.convertToDTO(savedTask);
     }
 
-    // Create multiple tasks
-    public List<TaskResponseDTO> createTasks(List<TaskDTO> taskDTOs) {
-        return taskDTOs.stream()
-                .map(this::createTask)
-                .collect(Collectors.toList());
-    }
-
     // Update task content
     public TaskResponseDTO updateTaskContent(Long id, TaskDTO taskDTO) {
         validateTask(taskDTO);
