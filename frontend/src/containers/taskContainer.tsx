@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { RootState, AppDispatch } from '../store/store';
-import { fetchTasks, toggleTaskCompletion, saveTask, deleteTask, fetchAverage, fetchAverageByPriority } from '../actions/taskActions';
+import { fetchTasks, toggleTaskCompletion, saveTask, deleteTask, fetchAllAverages } from '../actions/taskActions';
 import TaskList from '../components/TaskList';
 import Pagination from '../components/Pagination';
 import { Task } from '../constants/taskConstants';
@@ -42,10 +42,7 @@ const TaskContainer: React.FC = () => {
   const fetchData = useCallback(() => {
     const { name, priority, state } = filters;
     dispatch(fetchTasks(currentPage, name, priority, state, sortField, sortDirection));
-    dispatch(fetchAverage());
-    dispatch(fetchAverageByPriority('High'));
-    dispatch(fetchAverageByPriority('Medium'));
-    dispatch(fetchAverageByPriority('Low'));
+    dispatch(fetchAllAverages());
   }, [dispatch, currentPage, filters, sortField, sortDirection]);
   useEffect(() => {
     fetchData();
@@ -53,8 +50,8 @@ const TaskContainer: React.FC = () => {
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => setCurrentPage(page);
 
-  const handleToggleCompletion = (taskId: number) => {
-    dispatch(toggleTaskCompletion(taskId));
+  const handleToggleCompletion = async (taskId: number) => {
+    await dispatch(toggleTaskCompletion(taskId));
     fetchData();
   };
 

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { AppThunk } from '../store/store';
 import { Task, SET_TASKS, SAVE_TASK, DELETE_TASK, TOGGLE_TASK_COMPLETION, GET_AVERAGE, GET_AVERAGE_BY_PRIORITY } from '../constants/taskConstants';
 
-const API_URL = 'http://localhost:9090/api/v1/todos';
+const API_URL = 'http://localhost:9090/api/v2/todos';
 
 export const fetchTasks = (
   page: number,
@@ -31,22 +31,21 @@ export const fetchTasks = (
   }
 };
 
-
-export const fetchAverage = (): AppThunk => async (dispatch) => {
+export const fetchAllAverages = (): AppThunk => async (dispatch) => {
   try {
-    const response = await axios.get(API_URL + "/averageTime");
-    dispatch({ type: GET_AVERAGE, payload: response.data });
-  } catch (error) {
-    console.error('Error fetching time:', error);
-  }
-};
+    const [averageResponse, lowResponse, mediumResponse, highResponse] = await Promise.all([
+      axios.get(API_URL + "/averageTime"),
+      axios.get(API_URL + "/averageTime/Low"),
+      axios.get(API_URL + "/averageTime/Medium"),
+      axios.get(API_URL + "/averageTime/High"),
+    ]);
 
-export const fetchAverageByPriority = (priority: string): AppThunk => async (dispatch) => {
-  try {
-    const response = await axios.get(API_URL + `/averageTime/${priority}`);
-    dispatch({ type: GET_AVERAGE_BY_PRIORITY, payload: { [priority]: response.data } });
+    dispatch({ type: GET_AVERAGE, payload: averageResponse.data });
+    dispatch({ type: GET_AVERAGE_BY_PRIORITY, payload: { Low: lowResponse.data } });
+    dispatch({ type: GET_AVERAGE_BY_PRIORITY, payload: { Medium: mediumResponse.data } });
+    dispatch({ type: GET_AVERAGE_BY_PRIORITY, payload: { High: highResponse.data } });
   } catch (error) {
-    console.error('Error fetching time:', error);
+    console.error('Error fetching averages:', error);
   }
 };
 
